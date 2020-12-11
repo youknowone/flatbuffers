@@ -20,7 +20,9 @@
 // Helper functionality to glue FlatBuffers and GRPC.
 
 #include "flatbuffers/flatbuffers.h"
+#define private public
 #include "grpcpp/support/byte_buffer.h"
+#undef private
 #include "grpc/byte_buffer_reader.h"
 
 namespace flatbuffers {
@@ -287,8 +289,9 @@ template<class T> class SerializationTraits<flatbuffers::grpc::Message<T>> {
   }
 
   // Deserialize by pulling the
-  static grpc::Status Deserialize(grpc_byte_buffer *buffer,
+  static grpc::Status Deserialize(ByteBuffer *buf,
                                   flatbuffers::grpc::Message<T> *msg) {
+    grpc_byte_buffer *buffer = buf->c_buffer();
     if (!buffer) {
       return ::grpc::Status(::grpc::StatusCode::INTERNAL, "No payload");
     }
